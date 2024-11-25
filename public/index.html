@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            /* margin-top: 20px; */
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #04AA6D;
+            color: white;
+            border: none;
+        }
+
+        .filter {
+            /* display: flex; */
+            /* justify-content: flex-start; */
+            /* flex-direction: column; */
+            /* flex-wrap: wrap; */
+            margin-bottom: 20px;
+        }
+
+        .filter p {
+            margin-bottom: 0;
+        }
+
+        .add {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        input[type=text],
+        textarea {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type=submit] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+
+        input[type=date],
+        select {
+            padding: 12px 20px;
+            margin: 8px 0;
+            /* display: inline-block; */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* #updateTaskContainer {
+            margin: 20px 0;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        } */
+
+        #searchInput {
+            width: 85%;
+        }
+
+        #delBtn,
+        #updateBtn,
+        #addBtn {
+            border: none;
+            background: none;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        #updateBtn,
+        #addBtn {
+            color: blue;
+        }
+
+        #delBtn {
+            color: red;
+        }
+
+        #addBtn {
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        #logoutButton {
+            /* background-color: blue; */
+            background: none;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        #searchButton {
+            padding: 12px 15px;
+            border-radius: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            /* left: 5%; */
+            right: 2.5%;
+            top: 0;
+            width: 90%;
+            height: 60%;
+            overflow: auto;
+            /* background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4); */
+            /* padding-top: 60px; */
+            margin: 20px 0;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        .close {
+            position: absolute;
+            right: 35px;
+            top: 15px;
+            color: #000;
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        /*define the close hover and focus effects*/
+
+        .close:hover,
+        .close:focus {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div id="userInfo"></div>
+        <button id="logoutButton" class="button">Logout</button>
+    </header>
+
+    <div class="search">
+        <input type="text" id="searchInput" placeholder="Search tasks...">
+        <button id="searchButton" class="button">Search</button>
+    </div>
+
+    <div class="filter">
+        <p><b>Filters:</b></p>
+        <label for="priorityFilter">Priority:</label>
+        <select id="priorityFilter">
+            <option value="">All</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+        </select>
+
+        <label for="dateFilter">&nbsp;Deadline:</label>
+        <input type="date" id="dateFilter">
+
+        <button id="filterButton" class="button">Filter</button>
+        <button id="clearFilterButton" class="button">Clear Filter</button>
+    </div>
+
+    <div class="add">
+        <button id="addBtn">+Add Task</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+        <table id="taskTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Deadline</th>
+                    <th>Priority</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Tasks will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Update Task Form (hidden initially) style="display: none;" -->
+    <div id="updateTaskContainer" class="modal">
+        <span onclick="document.getElementById('updateTaskContainer').style.display='none'" class="close"
+            title="Close Modal">×</span>
+        <h2>Update Task</h2>
+        <form id="updateTaskForm">
+            <input type="hidden" id="updateTaskId" name="taskId" required>
+            <label for="updateTaskTitle">Title:</label>
+            <input type="text" id="updateTaskTitle" name="title" required>
+
+            <label for="updateTaskDescription">Description:</label>
+            <textarea id="updateTaskDescription" name="description" required></textarea>
+
+            <label for="updateTaskDeadline">Deadline:</label>
+            <input type="date" id="updateTaskDeadline" name="deadline" required>
+
+            <label for="updateTaskPriority">Priority:</label>
+            <select id="updateTaskPriority" name="priority" required>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+
+            <button type="submit" class="button">Update Task</button>
+        </form>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const userInfo = document.getElementById('userInfo');
+        const logoutButton = document.getElementById('logoutButton');
+        const addButton = document.getElementById('addBtn');
+        const taskTableBody = document.getElementById('taskTable').querySelector('tbody');
+        const updateTaskContainer = document.getElementById('updateTaskContainer');
+        const updateTaskForm = document.getElementById('updateTaskForm');
+
+        // Display username
+        async function displayUserInfo() {
+            const response = await fetch('http://localhost:5000/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const user = await response.json();
+            if (user.username === undefined) {
+                window.location.href = "/assignments/capstone_project/public/login.html"; // Redirect to login page
+            }
+            userInfo.innerText = `Welcome, ${user.username}`;
+        }
+
+        // Fetch and display tasks
+        // async function fetchTasks() {
+        //     const response = await fetch('http://localhost:5000/api/tasks', {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`
+        //         }
+        //     });
+        //     const tasks = await response.json();
+        //     renderTasks(tasks);
+        // }
+
+        async function fetchTasks(filters = {}) {
+            //const token = localStorage.getItem('token'); // Retrieve JWT token
+            const queryString = new URLSearchParams(filters).toString();
+            const response = await fetch(`http://localhost:5000/api/tasks${queryString ? '?' + queryString : ''}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const tasks = await response.json();
+            renderTasks(tasks);
+        }
+
+        // Render tasks in the table
+        function renderTasks(tasks) {
+            taskTableBody.innerHTML = ''; // Clear existing tasks
+            tasks.forEach(task => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${task.title}</td>
+                <td>${task.description}</td>
+                <td>${new Date(task.deadline).toLocaleDateString()}</td>
+                <td>${task.priority}</td>
+                <td>
+                    <button id="updateBtn" onclick="showUpdateForm('${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Update</button>
+                    <button id="delBtn" onclick="deleteTask('${task._id}')">Delete</button>
+                </td>
+            `;
+                taskTableBody.appendChild(row);
+            });
+        }
+
+        // Show update task form
+        function showUpdateForm(id, title, description, deadline, priority) {
+            document.getElementById('updateTaskId').value = id;
+            document.getElementById('updateTaskTitle').value = title;
+            document.getElementById('updateTaskDescription').value = description;
+            document.getElementById('updateTaskDeadline').value = deadline.split('T')[0]; // Format date
+            document.getElementById('updateTaskPriority').value = priority;
+            updateTaskContainer.style.display = 'block';
+        }
+
+        // Update task
+        updateTaskForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const taskId = document.getElementById('updateTaskId').value;
+            const title = document.getElementById('updateTaskTitle').value;
+            const description = document.getElementById('updateTaskDescription').value;
+            const deadline = document.getElementById('updateTaskDeadline').value;
+            const priority = document.getElementById('updateTaskPriority').value;
+
+            const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ title, description, deadline, priority }),
+            });
+
+            if (response.ok) {
+                alert('Task updated successfully!');
+                updateTaskContainer.style.display = 'none'; // Hide the update form
+                fetchTasks(); // Refresh the task list
+            } else {
+                const data = await response.json();
+                alert(data.error);
+            }
+        });
+
+        // Delete task
+        async function deleteTask(taskId) {
+            const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert('Task deleted successfully!');
+                fetchTasks(); // Refresh the task list
+            } else {
+                const data = await response.json();
+                alert(data.error);
+            }
+        }
+
+        // Search tasks
+        document.getElementById('searchButton').addEventListener('click', async () => {
+            const query = document.getElementById('searchInput').value;
+            const response = await fetch(`http://localhost:5000/api/tasks/search?q=${query}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const tasks = await response.json();
+            renderTasks(tasks);
+        });
+
+        // Event listener for the filter button
+        document.getElementById('filterButton').addEventListener('click', () => {
+            const priority = document.getElementById('priorityFilter').value;
+            const date = document.getElementById('dateFilter').value;
+            const filters = {};
+            if (priority) filters.priority = priority;
+            if (date) filters.deadline = date;
+            fetchTasks(filters);
+        });
+
+        // Clear filter button
+        document.getElementById('clearFilterButton').addEventListener('click', () => {
+            document.getElementById("priorityFilter").value = "";
+            document.getElementById("dateFilter").value = "";
+            fetchTasks();
+        });
+
+        // Open Add Task page function
+        addButton.addEventListener('click', () => {
+            window.location.href = "/assignments/capstone_project/public/addTask.html"; // Redirect to login page
+        });
+
+        // Logout function
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = "/assignments/capstone_project/public/login.html"; // Redirect to login page
+        });
+
+        // Initialize the page
+
+        displayUserInfo();
+        fetchTasks();
+    </script>
+
+</body>
+
+</html>

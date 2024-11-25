@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Add Task</title>
+
+    <style>
+        div {
+            margin: 20px 0;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        input[type=text],
+        textarea {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #04AA6D;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <form id="addTaskForm">
+            <h2>Add Task</h2>
+            <label for="taskTitle">Title:</label>
+            <input type="text" id="taskTitle" name="title" required>
+
+            <label for="taskDescription">Description:</label>
+            <textarea id="taskDescription" name="description" required></textarea>
+
+            <label for="taskDeadline">Deadline:</label>
+            <input type="date" id="taskDeadline" name="deadline" required>
+
+            <label for="taskPriority">Priority:</label>
+            <select id="taskPriority" name="priority" required>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+
+            <button type="submit">Add Task</button>
+        </form>
+    </div>
+
+
+    <script>
+        document.getElementById('addTaskForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const deadline = document.getElementById('taskDeadline').value;
+            const priority = document.getElementById('taskPriority').value;
+
+            const token = localStorage.getItem('token'); // Retrieve JWT token
+
+            const response = await fetch('http://localhost:5000/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ title, description, deadline, priority }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Task added successfully!');
+                // Optionally, clear the form or refresh the task list
+                window.location.href = "/assignments/capstone_project/public/";
+            } else {
+                alert(data.error);
+            }
+        });
+    </script>
+</body>
+
+</html>

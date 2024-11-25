@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Registration</title>
+
+    <style>
+        .container {
+            max-width: 500px;
+            border: 1px solid black;
+            margin: 50px auto;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-bottom: 5px;
+            background-color: #04AA6D;
+            color: white;
+            border: none;
+        }
+
+        div p {
+            display: inline;
+        }
+
+        #error {
+            color: red;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form id="registrationForm">
+            <h2>Register</h2>
+            <label for="regUsername">Username:</label>
+            <input type="text" id="regUsername" name="username" required>
+
+            <label for="regPassword">Password:</label>
+            <input type="password" id="regPassword" name="password" oninput="handleInput()" required>
+
+            <label for="regConfirmPassword">Confirm Password:</label>
+            <input type="password" id="regConfirmPassword" name="confirm_password" oninput="handleInput()" required>
+            <p id="error">Passwords do not Match!</p>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already registered?</p>&nbsp;<a href="/assignments/capstone_project/public/login.html">Login</a>
+    </div>
+
+    <script>
+        const errorMessage = document.getElementById('error');
+
+        function handleInput() {
+            errorMessage.style.display = 'none';
+        }
+
+        document.getElementById('registrationForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const username = document.getElementById('regUsername').value;
+
+            if (confirmPassword !== password) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password, confirmPassword }),
+            });
+
+            const data = await response.json();
+            //alert(data.message || data.error);
+            if (response.ok) {
+                alert('Registered successfully!');
+                // Redirect or update UI as needed
+                window.location.href = "/assignments/capstone_project/public/login.html";
+            } else {
+                alert(data.error);
+            }
+        });
+    </script>
+</body>
+
+</html>
