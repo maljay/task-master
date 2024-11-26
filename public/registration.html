@@ -34,6 +34,10 @@
             border: none;
         }
 
+        button:hover {
+            background-color: #04aa6d9b;
+        }
+
         div p {
             display: inline;
         }
@@ -94,7 +98,6 @@
             });
 
             const data = await response.json();
-            //alert(data.message || data.error);
             if (response.ok) {
                 alert('Registered successfully!');
                 // Redirect or update UI as needed

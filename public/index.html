@@ -22,7 +22,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            /* margin-top: 20px; */
+            margin-top: 5px;
         }
 
         th,
@@ -45,11 +45,11 @@
             border: none;
         }
 
+        .button:hover {
+            background-color: #04aa6d9b;
+        }
+
         .filter {
-            /* display: flex; */
-            /* justify-content: flex-start; */
-            /* flex-direction: column; */
-            /* flex-wrap: wrap; */
             margin-bottom: 20px;
         }
 
@@ -92,13 +92,12 @@
         select {
             padding: 12px 20px;
             margin: 8px 0;
-            /* display: inline-block; */
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
 
-        /* #updateTaskContainer {
+        /* #taskContainer {
             margin: 20px 0;
             border-radius: 5px;
             background-color: #f2f2f2;
@@ -133,7 +132,6 @@
         }
 
         #logoutButton {
-            /* background-color: blue; */
             background: none;
             color: blue;
             text-decoration: underline;
@@ -154,16 +152,13 @@
             width: 90%;
             height: 60%;
             overflow: auto;
-            /* background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4); */
-            /* padding-top: 60px; */
             margin: 20px 0;
             border-radius: 5px;
             background-color: #f2f2f2;
             padding: 20px;
         }
 
-        .close {
+        #close {
             position: absolute;
             right: 35px;
             top: 15px;
@@ -172,10 +167,8 @@
             font-weight: bold;
         }
 
-        /*define the close hover and focus effects*/
-
-        .close:hover,
-        .close:focus {
+        #close:hover,
+        #close:focus {
             color: red;
             cursor: pointer;
         }
@@ -212,7 +205,7 @@
     </div>
 
     <div class="add">
-        <button id="addBtn">+Add Task</button>
+        <button id="addBtn" onclick="showTaskForm()">+Add Task</button>
     </div>
 
     <div style="overflow-x:auto;">
@@ -233,29 +226,28 @@
     </div>
 
     <!-- Update Task Form (hidden initially) style="display: none;" -->
-    <div id="updateTaskContainer" class="modal">
-        <span onclick="document.getElementById('updateTaskContainer').style.display='none'" class="close"
-            title="Close Modal">×</span>
-        <h2>Update Task</h2>
-        <form id="updateTaskForm">
-            <input type="hidden" id="updateTaskId" name="taskId" required>
-            <label for="updateTaskTitle">Title:</label>
-            <input type="text" id="updateTaskTitle" name="title" required>
+    <div id="taskContainer" class="modal">
+        <span id="close" title="Close Modal">×</span>
+        <h2 id="taskHeading">Update Task</h2>
+        <form id="taskForm">
+            <input type="hidden" id="taskId" name="taskId" required>
+            <label for="taskTitle">Title:</label>
+            <input type="text" id="taskTitle" name="title" required>
 
-            <label for="updateTaskDescription">Description:</label>
-            <textarea id="updateTaskDescription" name="description" required></textarea>
+            <label for="taskDescription">Description:</label>
+            <textarea id="taskDescription" name="description" required></textarea>
 
-            <label for="updateTaskDeadline">Deadline:</label>
-            <input type="date" id="updateTaskDeadline" name="deadline" required>
+            <label for="taskDeadline">Deadline:</label>
+            <input type="date" id="taskDeadline" name="deadline" required>
 
-            <label for="updateTaskPriority">Priority:</label>
-            <select id="updateTaskPriority" name="priority" required>
+            <label for="taskPriority">Priority:</label>
+            <select id="taskPriority" name="priority" required>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
             </select>
 
-            <button type="submit" class="button">Update Task</button>
+            <button type="submit" class="button taskBtn">Update Task</button>
         </form>
     </div>
 
@@ -263,10 +255,10 @@
         const token = localStorage.getItem('token');
         const userInfo = document.getElementById('userInfo');
         const logoutButton = document.getElementById('logoutButton');
-        const addButton = document.getElementById('addBtn');
+        const closeTaskFormButton = document.getElementById('close');
         const taskTableBody = document.getElementById('taskTable').querySelector('tbody');
-        const updateTaskContainer = document.getElementById('updateTaskContainer');
-        const updateTaskForm = document.getElementById('updateTaskForm');
+        const taskContainer = document.getElementById('taskContainer');
+        const taskForm = document.getElementById('taskForm');
 
         // Display username
         async function displayUserInfo() {
@@ -282,19 +274,8 @@
             userInfo.innerText = `Welcome, ${user.username}`;
         }
 
-        // Fetch and display tasks
-        // async function fetchTasks() {
-        //     const response = await fetch('http://localhost:5000/api/tasks', {
-        //         headers: {
-        //             'Authorization': `Bearer ${token}`
-        //         }
-        //     });
-        //     const tasks = await response.json();
-        //     renderTasks(tasks);
-        // }
 
         async function fetchTasks(filters = {}) {
-            //const token = localStorage.getItem('token'); // Retrieve JWT token
             const queryString = new URLSearchParams(filters).toString();
             const response = await fetch(`http://localhost:5000/api/tasks${queryString ? '?' + queryString : ''}`, {
                 headers: {
@@ -316,7 +297,7 @@
                 <td>${new Date(task.deadline).toLocaleDateString()}</td>
                 <td>${task.priority}</td>
                 <td>
-                    <button id="updateBtn" onclick="showUpdateForm('${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Update</button>
+                    <button id="updateBtn" onclick="showTaskForm('${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Update</button>
                     <button id="delBtn" onclick="deleteTask('${task._id}')">Delete</button>
                 </td>
             `;
@@ -324,27 +305,55 @@
             });
         }
 
-        // Show update task form
-        function showUpdateForm(id, title, description, deadline, priority) {
-            document.getElementById('updateTaskId').value = id;
-            document.getElementById('updateTaskTitle').value = title;
-            document.getElementById('updateTaskDescription').value = description;
-            document.getElementById('updateTaskDeadline').value = deadline.split('T')[0]; // Format date
-            document.getElementById('updateTaskPriority').value = priority;
-            updateTaskContainer.style.display = 'block';
+        // Set up task form
+        function setupTaskForm(text) {
+            document.getElementById("taskHeading").innerText = text;
+            document.querySelector(".taskBtn").innerText = text;
         }
 
-        // Update task
-        updateTaskForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const taskId = document.getElementById('updateTaskId').value;
-            const title = document.getElementById('updateTaskTitle').value;
-            const description = document.getElementById('updateTaskDescription').value;
-            const deadline = document.getElementById('updateTaskDeadline').value;
-            const priority = document.getElementById('updateTaskPriority').value;
+        // Reset task form
+        function resetTaskForm() {
+            document.getElementById('taskId').value = "";
+            document.getElementById('taskTitle').value = "";
+            document.getElementById('taskDescription').value = "";
+            document.getElementById('taskDeadline').value = ""; // Format date
+            document.getElementById('taskPriority').value = "low";
+        }
 
-            const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
-                method: 'PUT',
+        // Show task form
+        function showTaskForm(id, title, description, deadline, priority) {
+            if (id) {
+                setupTaskForm('Update Task');
+                document.getElementById('taskId').value = id;
+                document.getElementById('taskTitle').value = title;
+                document.getElementById('taskDescription').value = description;
+                document.getElementById('taskDeadline').value = deadline.split('T')[0]; // Format date
+                document.getElementById('taskPriority').value = priority;
+            } else {
+                setupTaskForm('Add Task');
+            }
+
+            taskContainer.style.display = 'block';
+        }
+
+        // Add or Update task
+        taskForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const taskId = document.getElementById('taskId').value;
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const deadline = document.getElementById('taskDeadline').value;
+            const priority = document.getElementById('taskPriority').value;
+
+            let url = 'http://localhost:5000/api/tasks', correctMethod = 'POST';
+
+            if (taskId) {
+                url = `http://localhost:5000/api/tasks/${taskId}`;
+                correctMethod = 'PUT';
+            }
+
+            const response = await fetch(url, {
+                method: correctMethod,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -353,8 +362,13 @@
             });
 
             if (response.ok) {
-                alert('Task updated successfully!');
-                updateTaskContainer.style.display = 'none'; // Hide the update form
+                if (taskId) {
+                    alert('Task updated successfully!');
+                } else {
+                    alert('Task added successfully!');
+                }
+
+                taskContainer.style.display = 'none'; // Hide the update form
                 fetchTasks(); // Refresh the task list
             } else {
                 const data = await response.json();
@@ -380,7 +394,7 @@
             }
         }
 
-        // Search tasks
+        // Search tasks function
         document.getElementById('searchButton').addEventListener('click', async () => {
             const query = document.getElementById('searchInput').value;
             const response = await fetch(`http://localhost:5000/api/tasks/search?q=${query}`, {
@@ -392,7 +406,7 @@
             renderTasks(tasks);
         });
 
-        // Event listener for the filter button
+        // Filter function
         document.getElementById('filterButton').addEventListener('click', () => {
             const priority = document.getElementById('priorityFilter').value;
             const date = document.getElementById('dateFilter').value;
@@ -402,16 +416,17 @@
             fetchTasks(filters);
         });
 
-        // Clear filter button
+        // Clear filter function
         document.getElementById('clearFilterButton').addEventListener('click', () => {
             document.getElementById("priorityFilter").value = "";
             document.getElementById("dateFilter").value = "";
             fetchTasks();
         });
 
-        // Open Add Task page function
-        addButton.addEventListener('click', () => {
-            window.location.href = "/assignments/capstone_project/public/addTask.html"; // Redirect to login page
+        // Close Task Form function
+        closeTaskFormButton.addEventListener('click', () => {
+            document.getElementById('taskContainer').style.display = 'none';
+            resetTaskForm();
         });
 
         // Logout function
@@ -421,7 +436,6 @@
         });
 
         // Initialize the page
-
         displayUserInfo();
         fetchTasks();
     </script>
