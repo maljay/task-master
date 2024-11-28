@@ -13,8 +13,10 @@ exports.createTask = async (req, res) => {
 
     try {
         await task.save();
-        res.status(201).json(task);
+        //res.status(201).json(task);
+        res.status(201).json({ message: 'Task added successfully!', task });
     } catch (error) {
+        console.error('Error during task creation: ', error);
         res.status(400).json({ error: 'Task creation failed' });
     }
 };

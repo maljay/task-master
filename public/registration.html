@@ -103,7 +103,7 @@
 
             const data = await response.json();
             if (response.ok) {
-                alert('Registered successfully!');
+                alert(data.message);
                 // Redirect or update UI as needed
                 window.location.href = "/assignments/capstone_project/public/login.html";
             } else {
