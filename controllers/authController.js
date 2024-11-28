@@ -1,8 +1,11 @@
 const User = require('../models/User'); // User model
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
-const JWT_SECRET = 'your_jwt_secret'; // Replace with your own secret
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // User Registration
 exports.register = async (req, res) => {
@@ -20,9 +23,9 @@ exports.register = async (req, res) => {
 
         await user.save();
 
-        //user.username = "";
+        user.username = "";
         user.password = "";
-        res.status(201).json({ user, message: 'User registered successfully!' });
+        res.status(201).json({ message: 'User registered successfully!', user });
     } catch (error) {
         console.error('Error during registration: ', error);
         res.status(500).json({ error: error.message });

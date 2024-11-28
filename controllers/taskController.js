@@ -13,23 +13,12 @@ exports.createTask = async (req, res) => {
 
     try {
         await task.save();
-        //res.status(201).json(task);
         res.status(201).json({ message: 'Task added successfully!', task });
     } catch (error) {
-        console.error('Error during task creation: ', error);
-        res.status(400).json({ error: 'Task creation failed' });
+        //console.error('Error during task creation: ', error);
+        return res.status(500).json({ error: error.message });
     }
 };
-
-// Get All Tasks
-// exports.getAllTasks = async (req, res) => {
-//     try {
-//         const tasks = await Task.find({ userId: req.user.id });
-//         res.json(tasks);
-//     } catch (error) {
-//         res.status(500).json({ error: 'Failed to retrieve tasks' });
-//     }
-// };
 
 exports.getAllTasks = async (req, res) => {
     const { priority, deadline } = req.query; // Extract filters from query
@@ -44,17 +33,14 @@ exports.getAllTasks = async (req, res) => {
     if (deadline) {
         // Check if the deadline is a valid date and convert to ISO format
         const date = new Date(deadline);
-        if (!isNaN(date.getTime())) {
-            //filter.deadline = { $lte: date }; // Filter tasks with a deadline less than or equal to the specified date
 
+        if (!isNaN(date.getTime())) {
             const startOfDay = new Date(date);
             startOfDay.setHours(0, 0, 0, 0); // Start of the day
             const endOfDay = new Date(date);
             endOfDay.setHours(23, 59, 59, 999); // End of the day
 
             filter.deadline = { $gte: startOfDay, $lte: endOfDay }; // For tasks within the whole day
-
-            //filter.deadline = { $lte: endOfDay }; // For tasks on or before the end of the specified date
         }
     }
 

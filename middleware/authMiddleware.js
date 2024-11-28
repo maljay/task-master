@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const dotenv = require('dotenv');
 
-const JWT_SECRET = 'your_jwt_secret'; // Replace with your own secret
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.authenticate = async (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];

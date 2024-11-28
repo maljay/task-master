@@ -2,8 +2,6 @@ const request = require('supertest');
 const app = require('../server');
 const mongoose = require('mongoose');
 
-const uniqueUsername = `testUser_${Date.now()}`; // Generate a unique username
-
 beforeAll(async () => {
     // Connect to the test database
     await mongoose.connect(process.env.MONGODB_URI)
@@ -22,7 +20,7 @@ describe('User Authentication', () => {
         const response = await request(app)
             .post('/api/auth/register')
             .send({
-                username: uniqueUsername,
+                username: 'testUser',
                 password: 'password123'
             });
 
@@ -34,7 +32,7 @@ describe('User Authentication', () => {
         const response = await request(app)
             .post('/api/auth/register')
             .send({
-                username: uniqueUsername, // Use the same username
+                username: 'testUser', // Use the same username
                 password: 'password456'
             });
 
@@ -46,7 +44,7 @@ describe('User Authentication', () => {
         const response = await request(app)
             .post('/api/auth/login')
             .send({
-                username: uniqueUsername,
+                username: 'testUser',
                 password: 'password123'
             });
 

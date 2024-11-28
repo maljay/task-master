@@ -14,7 +14,7 @@ beforeAll(async () => {
     const userResponse = await request(app)
         .post('/api/auth/register')
         .send({
-            username: `testUser_${Date.now()}`, // Unique username
+            username: 'testUser123', // Unique username
             password: 'password123'
         });
 
@@ -24,7 +24,7 @@ beforeAll(async () => {
     const loginResponse = await request(app)
         .post('/api/auth/login')
         .send({
-            username: userResponse.body.user.username,
+            username: 'testUser123',
             password: 'password123'
         });
 
@@ -49,7 +49,7 @@ describe('Task Creation', () => {
                 id: userId // Associate task with the user
             });
 
-        console.log(response.body);
+        //console.log(response.body);
 
         expect(response.status).toBe(201);
         expect(response.body.message).toBe('Task added successfully!');
@@ -67,7 +67,7 @@ describe('Task Creation', () => {
                 id: userId
             });
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(500);
         expect(response.body.error).toBeDefined();
     });
 });
