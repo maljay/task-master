@@ -37,7 +37,8 @@ div p {
     display: inline;
 }
 
-#error {
+#error_password,
+#error_username {
     color: red;
     font-weight: bold;
     display: none;

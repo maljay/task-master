@@ -15,14 +15,15 @@
         <form id="registrationForm">
             <h2>Register</h2>
             <label for="regUsername">Username:</label>
-            <input type="text" id="regUsername" name="username" required>
+            <input type="text" id="regUsername" name="username" oninput="handleInput()" required>
+            <p id="error_username" style="display: none;">Username already exists!</p>
 
             <label for="regPassword">Password:</label>
             <input type="password" id="regPassword" name="password" oninput="handleInput()" required>
 
             <label for="regConfirmPassword">Confirm Password:</label>
             <input type="password" id="regConfirmPassword" name="confirm_password" oninput="handleInput()" required>
-            <p id="error" style="display: none;">Passwords do not Match!</p>
+            <p id="error_password" style="display: none;">Passwords do not Match!</p>
 
             <button type="submit">Register</button>
         </form>
@@ -31,10 +32,12 @@
     </div>
 
     <script>
-        const errorMessage = document.getElementById('error');
+        const errorPassword = document.getElementById('error_password');
+        const errorUsername = document.getElementById('error_username');
 
         function handleInput() {
-            errorMessage.style.display = 'none';
+            errorPassword.style.display = 'none';
+            errorUsername.style.display = 'none';
         }
 
         document.getElementById('registrationForm').addEventListener('submit', async (event) => {
@@ -45,7 +48,7 @@
             const username = document.getElementById('regUsername').value;
 
             if (confirmPassword !== password) {
-                errorMessage.style.display = 'block';
+                errorPassword.style.display = 'block';
                 return;
             }
 
@@ -62,7 +65,12 @@
                 alert(data.message);
                 window.location.href = "/login";
             } else {
-                alert(data.error);
+                if (data.error.includes("Username")) {
+                    errorUsername.style.display = 'block';
+                    return;
+                }
+                const errorMessage = data.error || "An unexpected error occurred. Please try again.";
+                alert(errorMessage);
             }
         });
     </script>
