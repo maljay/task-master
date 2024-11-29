@@ -4,48 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster - Login</title>
-
-    <style>
-        .container {
-            max-width: 500px;
-            border: 1px solid black;
-            margin: 50px auto;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        input[type=text],
-        input[type=password] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 10px 15px;
-            cursor: pointer;
-            margin-bottom: 5px;
-            background-color: #04AA6D;
-            color: white;
-            border: none;
-        }
-
-        button:hover {
-            background-color: #04aa6d9b;
-        }
-
-        button:active {
-            background-color: #04AA6D;
-        }
-
-        p {
-            display: inline;
-        }
-    </style>
+    <title>
+        <%= title %> - Login
+    </title>
+    <link rel="stylesheet" type="text/css" href="/css/login.css">
 </head>
 
 <body>
@@ -61,7 +23,7 @@
             <button type="submit">Login</button><br>
         </form>
 
-        <p>Not registered?</p>&nbsp;<a href="/assignments/capstone_project/public/registration.html">Register</a>
+        <p>Not registered?</p>&nbsp;<a href="/registration">Register</a>
     </div>
 
     <script>
@@ -82,9 +44,8 @@
             const data = await response.json();
             if (response.ok) {
                 alert('Login successful!');
-                localStorage.setItem('token', data.token); // Store JWT token for future requests
-                // Redirect or update UI as needed
-                window.location.href = "/assignments/capstone_project/public/";
+                localStorage.setItem('token', data.token);
+                window.location.href = "/";
             } else {
                 alert(data.error);
             }

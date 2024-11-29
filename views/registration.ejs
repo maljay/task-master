@@ -4,54 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster - Registration</title>
-
-    <style>
-        .container {
-            max-width: 500px;
-            border: 1px solid black;
-            margin: 50px auto;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        input[type=text],
-        input[type=password] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 10px 15px;
-            cursor: pointer;
-            margin-bottom: 5px;
-            background-color: #04AA6D;
-            color: white;
-            border: none;
-        }
-
-        button:hover {
-            background-color: #04aa6d9b;
-        }
-
-        button:active {
-            background-color: #04AA6D;
-        }
-
-        div p {
-            display: inline;
-        }
-
-        #error {
-            color: red;
-            font-weight: bold;
-            display: none;
-        }
-    </style>
+    <title>
+        <%= title %> - Registration
+    </title>
+    <link rel="stylesheet" type="text/css" href="/css/registration.css">
 </head>
 
 <body>
@@ -66,12 +22,12 @@
 
             <label for="regConfirmPassword">Confirm Password:</label>
             <input type="password" id="regConfirmPassword" name="confirm_password" oninput="handleInput()" required>
-            <p id="error">Passwords do not Match!</p>
+            <p id="error" style="display: none;">Passwords do not Match!</p>
 
             <button type="submit">Register</button>
         </form>
 
-        <p>Already registered?</p>&nbsp;<a href="/assignments/capstone_project/public/login.html">Login</a>
+        <p>Already registered?</p>&nbsp;<a href="/login">Login</a>
     </div>
 
     <script>
@@ -104,8 +60,7 @@
             const data = await response.json();
             if (response.ok) {
                 alert(data.message);
-                // Redirect or update UI as needed
-                window.location.href = "/assignments/capstone_project/public/login.html";
+                window.location.href = "/login";
             } else {
                 alert(data.error);
             }

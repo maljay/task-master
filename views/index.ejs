@@ -4,188 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster - Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 5px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .button {
-            padding: 10px 15px;
-            margin: 5px;
-            cursor: pointer;
-            background-color: #04AA6D;
-            color: white;
-            border: none;
-        }
-
-        .button:hover {
-            background-color: #04aa6d9b;
-        }
-
-        .button:active {
-            background-color: #04AA6D;
-        }
-
-        .filter {
-            margin-bottom: 20px;
-        }
-
-        .filter p {
-            margin-bottom: 0;
-        }
-
-        .add {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        input[type=text],
-        textarea {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        input[type=date],
-        select {
-            padding: 12px 20px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        #searchInput {
-            width: 85%;
-        }
-
-        #delBtn,
-        #updateBtn,
-        #addBtn {
-            border: none;
-            background: none;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        #updateBtn,
-        #addBtn {
-            color: blue;
-        }
-
-        #delBtn {
-            color: red;
-        }
-
-        #addBtn {
-            font-weight: bold;
-            margin-bottom: 0;
-        }
-
-        #logoutButton {
-            background: none;
-            color: blue;
-            text-decoration: underline;
-        }
-
-        #searchButton {
-            padding: 12px 15px;
-            border-radius: 4px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 90%;
-            height: 60%;
-            overflow: auto;
-            margin-top: 5%;
-            margin-left: 3.5%;
-            border-radius: 5px;
-            background-color: #f2f2f2;
-            padding: 20px;
-        }
-
-        #close {
-            position: absolute;
-            right: 35px;
-            top: 15px;
-            color: #000;
-            font-size: 40px;
-            font-weight: bold;
-        }
-
-        #close:hover,
-        #close:focus {
-            color: red;
-            cursor: pointer;
-        }
-
-        @media screen and (max-width: 600px) {
-            #searchInput {
-                width: 70%;
-            }
-
-            input[type=date],
-            select {
-                padding: 3px 5px;
-            }
-
-            .button {
-                margin: 3px 5px 0;
-            }
-        }
-
-        @media only screen and (min-width: 768px) {
-            .modal {
-                right: 0;
-                top: 0;
-                width: 50%;
-                height: 50%;
-                margin-top: 0;
-                margin-left: auto;
-            }
-        }
-    </style>
+    <title>
+        <%= title %> - Dashboard
+    </title>
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
 </head>
 
 <body>
@@ -240,8 +62,7 @@
         </table>
     </div>
 
-    <!-- Task Form (hidden initially) style="display: none;" -->
-    <div id="taskContainer" class="modal">
+    <div id="taskContainer" class="modal" style="display: none;">
         <span id="close" title="Close Modal">×</span>
         <h2 id="taskHeading">Update Task</h2>
         <form id="taskForm">
@@ -275,7 +96,6 @@
         const taskContainer = document.getElementById('taskContainer');
         const taskForm = document.getElementById('taskForm');
 
-        // Display username
         async function displayUserInfo() {
             const response = await fetch('http://localhost:5000/api/auth/me', {
                 headers: {
@@ -284,11 +104,10 @@
             });
             const user = await response.json();
             if (user.username === undefined) {
-                window.location.href = "/assignments/capstone_project/public/login.html"; // Redirect to login page
+                window.location.href = "/login";
             }
             userInfo.innerText = `Welcome, ${user.username}`;
         }
-
 
         async function fetchTasks(filters = {}) {
             const queryString = new URLSearchParams(filters).toString();
@@ -301,57 +120,51 @@
             renderTasks(tasks);
         }
 
-        // Render tasks in the table
         function renderTasks(tasks) {
-            taskTableBody.innerHTML = ''; // Clear existing tasks
+            taskTableBody.innerHTML = '';
             tasks.forEach(task => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                <td>${task.title}</td>
-                <td>${task.description}</td>
-                <td>${new Date(task.deadline).toLocaleDateString()}</td>
-                <td>${task.priority}</td>
-                <td>
-                    <button id="updateBtn" onclick="showTaskForm('${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Update</button>
-                    <button id="delBtn" onclick="deleteTask('${task._id}')">Delete</button>
-                </td>
-            `;
+                    <td>${task.title}</td>
+                    <td>${task.description}</td>
+                    <td>${new Date(task.deadline).toLocaleDateString()}</td>
+                    <td>${task.priority}</td>
+                    <td>
+                        <button id="updateBtn" onclick="showTaskForm('${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Update</button>
+                        <button id="delBtn" onclick="deleteTask('${task._id}')">Delete</button>
+                    </td>
+                `;
                 taskTableBody.appendChild(row);
             });
         }
 
-        // Set up task form
         function setupTaskForm(text) {
             document.getElementById("taskHeading").innerText = text;
             document.querySelector(".taskBtn").innerText = text;
         }
 
-        // Reset task form
         function resetTaskForm() {
             document.getElementById('taskId').value = "";
             document.getElementById('taskTitle').value = "";
             document.getElementById('taskDescription').value = "";
-            document.getElementById('taskDeadline').value = ""; // Format date
+            document.getElementById('taskDeadline').value = "";
             document.getElementById('taskPriority').value = "low";
         }
 
-        // Show task form
         function showTaskForm(id, title, description, deadline, priority) {
             if (id) {
                 setupTaskForm('Update Task');
                 document.getElementById('taskId').value = id;
                 document.getElementById('taskTitle').value = title;
                 document.getElementById('taskDescription').value = description;
-                document.getElementById('taskDeadline').value = deadline.split('T')[0]; // Format date
+                document.getElementById('taskDeadline').value = deadline.split('T')[0];
                 document.getElementById('taskPriority').value = priority;
             } else {
                 setupTaskForm('Add Task');
             }
-
             taskContainer.style.display = 'block';
         }
 
-        // Add or Update task
         taskForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             const taskId = document.getElementById('taskId').value;
@@ -377,21 +190,15 @@
             });
 
             if (response.ok) {
-                if (taskId) {
-                    alert('Task updated successfully!');
-                } else {
-                    alert('Task added successfully!');
-                }
-
-                taskContainer.style.display = 'none'; // Hide the update form
-                fetchTasks(); // Refresh the task list
+                alert(taskId ? 'Task updated successfully!' : 'Task added successfully!');
+                taskContainer.style.display = 'none';
+                fetchTasks();
             } else {
                 const data = await response.json();
                 alert(data.error);
             }
         });
 
-        // Delete task
         async function deleteTask(taskId) {
             const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
                 method: 'DELETE',
@@ -402,14 +209,13 @@
 
             if (response.ok) {
                 alert('Task deleted successfully!');
-                fetchTasks(); // Refresh the task list
+                fetchTasks();
             } else {
                 const data = await response.json();
                 alert(data.error);
             }
         }
 
-        // Search tasks function
         document.getElementById('searchButton').addEventListener('click', async () => {
             const query = document.getElementById('searchInput').value;
             const response = await fetch(`http://localhost:5000/api/tasks/search?q=${query}`, {
@@ -421,7 +227,6 @@
             renderTasks(tasks);
         });
 
-        // Filter function
         document.getElementById('filterButton').addEventListener('click', () => {
             const priority = document.getElementById('priorityFilter').value;
             const date = document.getElementById('dateFilter').value;
@@ -431,26 +236,22 @@
             fetchTasks(filters);
         });
 
-        // Clear filter function
         document.getElementById('clearFilterButton').addEventListener('click', () => {
             document.getElementById("priorityFilter").value = "";
             document.getElementById("dateFilter").value = "";
             fetchTasks();
         });
 
-        // Close Task Form function
         closeTaskFormButton.addEventListener('click', () => {
             document.getElementById('taskContainer').style.display = 'none';
             resetTaskForm();
         });
 
-        // Logout function
         logoutButton.addEventListener('click', () => {
             localStorage.removeItem('token');
-            window.location.href = "/assignments/capstone_project/public/login.html"; // Redirect to login page
+            window.location.href = "/login";
         });
 
-        // Initialize the page
         displayUserInfo();
         fetchTasks();
     </script>

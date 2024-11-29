@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 const authRoutes = require('./routes/auth'); // Import authentication routes
 const taskRoutes = require('./routes/tasks'); // Import task routes
 const dotenv = require('dotenv');
@@ -22,8 +23,27 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/auth', authRoutes); // Authentication routes
 app.use('/api/tasks', taskRoutes); // Task management routes
 
+// Set EJS as the templating engine
+app.set('view engine', 'ejs');
+
 // Serve static files for frontend
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Set the views directory
+app.set('views', path.join(__dirname, 'views'));
+
+// Routes
+app.get('/', (req, res) => {
+    res.render('index', { title: 'TaskMaster' });
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', { title: 'TaskMaster - Login' });
+});
+
+app.get('/registration', (req, res) => {
+    res.render('registration', { title: 'TaskMaster - Registration' });
+});
 
 // Export the app for testing
 module.exports = app;
