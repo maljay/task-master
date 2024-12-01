@@ -1,4 +1,4 @@
-.container {
+/* .container {
     max-width: 500px;
     border: 1px solid black;
     margin: 50px auto;
@@ -42,4 +42,59 @@ div p {
     color: red;
     font-weight: bold;
     display: none;
+} */
+
+.container {
+    max-width: 500px;
+    border: 1px solid #ddd;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+    /* White background for form */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+}
+
+input[type=text],
+input[type=password] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+    /* Highlight on focus */
+}
+
+input[type=text]:focus,
+input[type=password]:focus {
+    border-color: #04AA6D;
+    /* Highlight border on focus */
+}
+
+button {
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-top: 10px;
+    background-color: #04AA6D;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    /* Rounded corners */
+    transition: background-color 0.3s;
+    /* Smooth transition */
+}
+
+button:hover {
+    background-color: #037e54;
+    /* Darker shade on hover */
+}
+
+#error {
+    color: red;
+    font-weight: bold;
+    display: none;
+    /* Hide initially */
 }

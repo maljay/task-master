@@ -19,33 +19,34 @@
 
     <h1>Task Master</h1>
 
+    <div class="add">
+        <button id="addBtn" class="button" onclick="showTaskForm()">+Add Task</button>
+    </div>
+
     <div class="search">
         <input type="text" id="searchInput" placeholder="Search tasks...">
         <button id="searchButton" class="button">Search</button>
     </div>
 
+    <p><b>Filter Tasks:</b></p>
     <div class="filter">
-        <p><b>Filters:</b></p>
-        <label for="priorityFilter">Priority:</label>
-        <select id="priorityFilter">
-            <option value="">All</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-        </select>
+        <div>
+            <label for="priorityFilter">Priority:</label>
+            <select id="priorityFilter" onchange="filterTasks()">
+                <option value="">All</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
 
-        <label for="dateFilter">&nbsp;Deadline:</label>
-        <input type="date" id="dateFilter">
-
-        <button id="filterButton" class="button">Filter</button>
+            <label for="dateFilter">&nbsp;Deadline:</label>
+            <input type="date" id="dateFilter" onchange="filterTasks()">
+        </div>
         <button id="clearFilterButton" class="button">Clear Filter</button>
+
     </div>
 
-    <div class="add">
-        <button id="addBtn" onclick="showTaskForm()">+Add Task</button>
-    </div>
-
-    <div style="overflow-x:auto;">
+    <div class="table-container">
         <table id="taskTable">
             <thead>
                 <tr>
@@ -106,7 +107,7 @@
             if (user.username === undefined) {
                 window.location.href = "/login";
             }
-            userInfo.innerText = `Welcome, ${user.username}`;
+            userInfo.innerHTML = `Welcome, <b>${user.username}</b>`;
         }
 
         async function fetchTasks(filters = {}) {
@@ -136,6 +137,15 @@
                 `;
                 taskTableBody.appendChild(row);
             });
+        }
+
+        function filterTasks() {
+            const priority = document.getElementById('priorityFilter').value;
+            const date = document.getElementById('dateFilter').value;
+            const filters = {};
+            if (priority) filters.priority = priority;
+            if (date) filters.deadline = date;
+            fetchTasks(filters);
         }
 
         function setupTaskForm(text) {
@@ -227,14 +237,14 @@
             renderTasks(tasks);
         });
 
-        document.getElementById('filterButton').addEventListener('click', () => {
-            const priority = document.getElementById('priorityFilter').value;
-            const date = document.getElementById('dateFilter').value;
-            const filters = {};
-            if (priority) filters.priority = priority;
-            if (date) filters.deadline = date;
-            fetchTasks(filters);
-        });
+        // document.getElementById('filterButton').addEventListener('click', () => {
+        //     const priority = document.getElementById('priorityFilter').value;
+        //     const date = document.getElementById('dateFilter').value;
+        //     const filters = {};
+        //     if (priority) filters.priority = priority;
+        //     if (date) filters.deadline = date;
+        //     fetchTasks(filters);
+        // });
 
         document.getElementById('clearFilterButton').addEventListener('click', () => {
             document.getElementById("priorityFilter").value = "";
