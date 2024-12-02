@@ -237,14 +237,12 @@
             renderTasks(tasks);
         });
 
-        // document.getElementById('filterButton').addEventListener('click', () => {
-        //     const priority = document.getElementById('priorityFilter').value;
-        //     const date = document.getElementById('dateFilter').value;
-        //     const filters = {};
-        //     if (priority) filters.priority = priority;
-        //     if (date) filters.deadline = date;
-        //     fetchTasks(filters);
-        // });
+        document.getElementById('searchInput').addEventListener('input', () => {
+            if (document.getElementById("searchInput").value == "") {
+                fetchTasks();
+            }
+
+        });
 
         document.getElementById('clearFilterButton').addEventListener('click', () => {
             document.getElementById("priorityFilter").value = "";
