@@ -42,7 +42,7 @@
             <label for="dateFilter">&nbsp;Deadline:</label>
             <input type="date" id="dateFilter" onchange="filterTasks()">
         </div>
-        <button id="clearFilterButton" class="button">Clear Filter</button>
+        <button id="clearFilterButton" class="button">Reset Filter</button>
 
     </div>
 
@@ -64,10 +64,10 @@
     </div>
 
     <div id="taskContainer" class="modal" style="display: none;">
-        <span id="close" title="Close Modal">×</span>
+        <span id="close" title="Close Modal" onclick="cancelOrCloseTask()">×</span>
         <h2 id="taskHeading">Update Task</h2>
         <form id="taskForm">
-            <input type="hidden" id="taskId" name="taskId" required>
+            <input type="hidden" id="taskInfo" name="taskInfo" required>
             <label for="taskTitle">Title:</label>
             <input type="text" id="taskTitle" name="title" required>
 
@@ -85,6 +85,7 @@
             </select>
 
             <button type="submit" class="button taskBtn">Update Task</button>
+            <button id="cancelTaskBtn" class="button" onclick="cancelOrCloseTask()">Cancel</button>
         </form>
     </div>
 
@@ -131,8 +132,8 @@
                     <td>${new Date(task.deadline).toLocaleDateString()}</td>
                     <td>${task.priority}</td>
                     <td>
-                        <button id="updateBtn" onclick="showTaskForm('${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Update</button>
-                        <button id="delBtn" onclick="deleteTask('${task._id}')">Delete</button>
+                        <button id="updateBtn" onclick="showTaskForm('UPDATE','${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Update</button>
+                        <button id="delBtn" onclick="showTaskForm('DELETE','${task._id}', '${task.title}', '${task.description}', '${task.deadline}', '${task.priority}')">Delete</button>
                     </td>
                 `;
                 taskTableBody.appendChild(row);
@@ -148,46 +149,73 @@
             fetchTasks(filters);
         }
 
-        function setupTaskForm(text) {
-            document.getElementById("taskHeading").innerText = text;
-            document.querySelector(".taskBtn").innerText = text;
+        function setupTaskForm(headingText, buttonText) {
+            document.getElementById("taskHeading").innerText = headingText;
+            document.querySelector(".taskBtn").innerText = buttonText;
+            if (buttonText === "Delete") {
+                document.getElementById("taskHeading").style.color = "red";
+                document.querySelector(".taskBtn").style.backgroundColor = "red";
+            } else {
+                document.getElementById("taskHeading").style.color = "black";
+                document.querySelector(".taskBtn").style.backgroundColor = "#04AA6D";
+            }
         }
 
         function resetTaskForm() {
-            document.getElementById('taskId').value = "";
+            document.getElementById('taskInfo').value = "";
             document.getElementById('taskTitle').value = "";
             document.getElementById('taskDescription').value = "";
             document.getElementById('taskDeadline').value = "";
             document.getElementById('taskPriority').value = "low";
         }
 
-        function showTaskForm(id, title, description, deadline, priority) {
+        function cancelOrCloseTask() {
+            taskContainer.style.display = 'none';
+            resetTaskForm();
+        }
+
+        function showTaskForm(action, id, title, description, deadline, priority) {
             if (id) {
-                setupTaskForm('Update Task');
-                document.getElementById('taskId').value = id;
+                if (action === "UPDATE") {
+                    setupTaskForm('Update Task', 'Update');
+                } else {
+                    setupTaskForm('Are you sure you want to delete Task?', 'Delete');
+                }
+                document.getElementById('taskInfo').value = id + "|" + action;
                 document.getElementById('taskTitle').value = title;
                 document.getElementById('taskDescription').value = description;
                 document.getElementById('taskDeadline').value = deadline.split('T')[0];
                 document.getElementById('taskPriority').value = priority;
             } else {
-                setupTaskForm('Add Task');
+                setupTaskForm('Add Task', 'Add');
             }
             taskContainer.style.display = 'block';
         }
 
         taskForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            const taskId = document.getElementById('taskId').value;
+            const taskInfo = document.getElementById('taskInfo').value;
             const title = document.getElementById('taskTitle').value;
             const description = document.getElementById('taskDescription').value;
             const deadline = document.getElementById('taskDeadline').value;
             const priority = document.getElementById('taskPriority').value;
 
             let url = 'http://localhost:5000/api/tasks', correctMethod = 'POST';
+            let taskId = "";
 
-            if (taskId) {
+            if (taskInfo) {
+                const dividerIndex = taskInfo.indexOf("|");
+                taskId = taskInfo.substring(0, dividerIndex);
+                const taskAction = taskInfo.substring(dividerIndex + 1);
                 url = `http://localhost:5000/api/tasks/${taskId}`;
-                correctMethod = 'PUT';
+
+                if (taskAction === "UPDATE") {
+                    correctMethod = 'PUT';
+                } else {
+                    deleteTask(taskId);
+                    return;
+                }
+
             }
 
             const response = await fetch(url, {
@@ -202,6 +230,7 @@
             if (response.ok) {
                 alert(taskId ? 'Task updated successfully!' : 'Task added successfully!');
                 taskContainer.style.display = 'none';
+                resetTaskForm();
                 fetchTasks();
             } else {
                 const data = await response.json();
@@ -219,6 +248,8 @@
 
             if (response.ok) {
                 alert('Task deleted successfully!');
+                taskContainer.style.display = 'none';
+                resetTaskForm();
                 fetchTasks();
             } else {
                 const data = await response.json();
@@ -241,7 +272,6 @@
             if (document.getElementById("searchInput").value == "") {
                 fetchTasks();
             }
-
         });
 
         document.getElementById('clearFilterButton').addEventListener('click', () => {
@@ -250,10 +280,10 @@
             fetchTasks();
         });
 
-        closeTaskFormButton.addEventListener('click', () => {
-            document.getElementById('taskContainer').style.display = 'none';
-            resetTaskForm();
-        });
+        // closeTaskFormButton.addEventListener('click', () => {
+        //     taskContainer.style.display = 'none';
+        //     resetTaskForm();
+        // });
 
         logoutButton.addEventListener('click', () => {
             localStorage.removeItem('token');

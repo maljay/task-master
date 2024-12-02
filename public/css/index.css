@@ -107,10 +107,18 @@ th {
     color: #04AA6D;
 }
 
+#cancelTaskBtn {
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
 #addBtn:hover,
 #logoutButton:hover,
 #delBtn:hover,
-#updateBtn:hover {
+#updateBtn:hover,
+#cancelTaskBtn:hover {
     font-weight: bold;
 }
 
