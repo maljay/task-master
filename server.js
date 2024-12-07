@@ -38,11 +38,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { title: 'TaskMaster - Login' });
+    res.render('login', { title: 'TaskMaster' });
 });
 
 app.get('/registration', (req, res) => {
-    res.render('registration', { title: 'TaskMaster - Registration' });
+    res.render('registration', { title: 'TaskMaster' });
 });
 
 // Export the app for testing
